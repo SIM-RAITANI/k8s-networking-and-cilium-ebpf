@@ -1,10 +1,39 @@
 ---
-title: "Kubernetes Network Security: Abstract and Fundamentals"
-description: "An introduction to K8s network security, focusing on the shift to Zero Trust and the role of CNI and eBPF."
-keywords: [Kubernetes, K8s Security, Zero Trust, CNI, eBPF, Cilium]
+title: "Understanding K8s Network Security: From IP-Based to Identity-Based Zero Trust"
+description: "A comprehensive deep dive into Kubernetes network security. Learn about the 4 C's of cloud-native security, the limitations of standard CNI, and how Cilium uses eBPF for identity-based security and observability."
+keywords: [Kubernetes Network Security, Cilium eBPF Security, Zero-Trust Kubernetes, Identity-Based Network Policy, K8s Security, CNI, Hubble, eBPF]
+author: "Simran Raitani"
 ---
 
-# 1. ABSTRACT
+# Understanding of K8s Network Security
+
+> **Overview:** This documentation explores the transition from traditional flat-network IP filtering to modern identity-based security. It covers the core principles of Zero Trust, the architecture of the Container Network Interface (CNI), and how eBPF technology enables high-performance observability and security at scale.
+
+---
+
+## Table of Contents
+1. [Abstract](#1-abstract)
+2. [Introduction: The State of Network Security](#2-introduction-the-state-of-network-security)
+    * [2.1 The Flat Network Problem](#21-the-flat-network-problem)
+    * [2.2 The Risk of Lateral Movement](#22-the-risk-of-lateral-movement)
+    * [2.3 Zero Trust Architecture](#23-zero-trust-architecture)
+3. [Overview of K8s Network Security](#3-overview-of-k8s-network-security)
+    * [3.1 4 C’s of Cloud Native Security](#31-4-cs-of-cloud-native-security)
+    * [3.2 Kubernetes Network Policies](#32-kubernetes-network-policies)
+    * [3.3 Default Deny Strategy](#33-default-deny-strategy)
+    * [3.4 Limitations](#34-limitations)
+4. [Issue with Scalability of Standard Networking](#4-issue-with-scalability-of-standard-networking)
+    * [4.1 Performance Bottleneck: The iptables Limit](#41-performance-bottleneck-the-iptables-limit)
+    * [4.2 Visibility Gaps: Managing the Black Box](#42-visibility-gaps-managing-the-black-box)
+    * [4.3 IP-based Security vs. Identity-based Security](#43-ip-based-security-vs-identity-based-security)
+5. [Cilium: Next-Generation Networking with eBPF](#5-cilium-next-generation-networking-with-ebpf)
+6. [Managing Security at Scale with Cilium](#6-managing-security-at-scale-with-cilium)
+7. [Observability](#7-observability)
+8. [Summary & Conclusion](#8-summary)
+
+---
+
+## 1. ABSTRACT
 
 In the ever-evolving world of technology, security is one of the major concerns for big as well as small organisations. As businesses heavily rely on Kubernetes to manage their applications, security of containerized environments has become paramount. 
 
@@ -34,7 +63,7 @@ Because of these risks, the security of clusters and workloads has become paramo
 
 By default, Kubernetes follows a **flat network policy**, meaning all devices are connected to each other via a single network without any hierarchy or control. It is built on the assumption that everything inside the network is safe and should be able to communicate freely. 
 
-
+![Flat Network Problem](../assets/flat-network-architecture.png)
 
 In this model, a frontend pod exposed to the internet can directly communicate with a database pod without any restrictive rules. While a flat network is suitable for small applications, for large-scale environments, it significantly increases the attack surface. If an attacker exploits a vulnerability in a web service, the flat network allows them to scan the entire cluster easily.
 
@@ -200,7 +229,7 @@ This identity follows the workload regardless of its IP address or which node it
 ### 5.1 Introduction to Cilium
 Cilium is an open-source, cloud-native project designed to provide high-performance networking, security, and observability for Kubernetes workloads. Cilium was developed from the ground up to manage the scale and dynamic nature of contemporary microservices, in contrast to traditional CNIs that rely on outdated Linux networking tools. It replaces kube-proxy as a unified data plane, providing deep visibility into cluster communications, enforce security, and route traffic more effectively.
 
-
+![Cilium Architecture](../assets/cilium-architecture-design.png)
 
 ### 5.2 eBPF Evolution
 eBPF (Extended Berkeley Packet Filter) is the innovation that powers Cilium's performance. The Linux kernel used to contain networking logic, but it was inflexible and took a long time to evolve. By enabling developers to run sandboxed programs inside the kernel without altering the kernel source code, eBPF advanced this. By avoiding the overhead of "context switching" between user-space and kernel-space, which slows down conventional firewalls, Cilium is able to intercept and process network packets at nearly native hardware speeds.
@@ -244,7 +273,7 @@ The Service Map is Hubble's most potent feature. It offers a graphical depiction
 ### 7.3 Forensic Network Analysis
 Hubble offers Network Forensics tools in case of a production outage or security breach. Every flow is meticulously recorded, along with the source and destination identities and the particular policy that permitted or prohibited the traffic. This facilitates quick root-cause analysis and streamlines the compliance auditing process.
 
----
+
 
 ## 8. Summary
 
